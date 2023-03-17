@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node {
+    int value;
+    struct node* left;
+    struct node* right;
+} Node;
+
+Node* createNode(int value) {
+    Node* newNode = (Node*) malloc(sizeof(Node));
+    newNode->value = value;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+void insertNode(Node** root, int value) {
+    if (*root == NULL) {
+        *root = createNode(value);
+        return;
+    }
+
+    if (value < (*root)->value) {
+        insertNode(&(*root)->left, value);
+    } else if (value > (*root)->value) {
+        insertNode(&(*root)->right, value);
+    }
+}
+
+void imprime_decrescente(Node* node) {
+    if (node == NULL) {
+        return;
+    }
+
+    imprime_decrescente(node->right);
+    printf("%d ", node->value);
+    imprime_decrescente(node->left);
+}
+
+int main() {
+    Node* root = NULL;
+
+    insertNode(&root, 50);
+    insertNode(&root, 30);
+    insertNode(&root, 90);
+    insertNode(&root, 20);
+    insertNode(&root, 40);
+    insertNode(&root, 95);
+    insertNode(&root, 10);
+    insertNode(&root, 35);
+    insertNode(&root, 45);
+
+    imprime_decrescente(root);
+
+    return 0;
+}
