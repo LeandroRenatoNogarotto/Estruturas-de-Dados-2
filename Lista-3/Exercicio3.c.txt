@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Definir a estrutura de um nó da árvore AVL
+struct AVLNode {
+    char* key;
+    struct AVLNode* left;
+    struct AVLNode* right;
+    int height;
+};
+
+// Função para criar um novo nó com uma chave dada
+struct AVLNode* newNode(char* key) {
+    struct AVLNode* node = (struct AVLNode*) malloc(sizeof(struct AVLNode));
+    node->key = (char*) malloc(strlen(key) + 1);
+    strcpy(node->key, key);
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;  // altura inicial do nó é 1
+    return node;
+}
+
+// Função para obter a altura de uma árvore AVL
+int getHeight(struct AVLNode* node) {
+    if (node == NULL) {
+        return 0;
+    }
+    return node->height;
+}
+
+// Função para obter o fator de balanceamento de um nó da árvore AVL
+int getBalanceFactor(struct AVLNode* node) {
+    if (node == NULL) {
+        return 0;
+    }
+    return getHeight(node->left) - getHeight(node->right);
+}
+
+// Função para fazer a rotação à direita em torno do nó y
+struct AVLNode* rotateRight(struct AVLNode* y) {
+    struct AVLNode* x = y->left;
+    struct AVLNode* T2 = x->right;
+
+    // realiza a rotação
+    x->right = y;
+    y->left = T2;
+
+    // atualiza as alturas
+    y->height = 1 + fmax(getHeight(y->left), getHeight(y->right));
+    x->height = 1 + fmax(getHeight(x->left), getHeight(x->right));
+
+    return x;
+}
+
+// Função para fazer a rotação à esquerda em torno do nó x
+struct AVLNode* rotateLeft(struct AVLNode* x) {
+    struct AVLNode* y = x->right;
+    struct AVLNode* T2 = y->left;
+
+    // realiza a rotação
+    y->left = x;
+    x->right = T2;
+
+    // atualiza as alturas
+    x->height = 1 + fmax(getHeight(x->left), getHeight(x->right));
+    y->height = 1 + fmax(getHeight(y->left), getHeight(y->right));
+
+    return y;
+}
+
+// Função para inserir uma nova chave em uma árvore AVL
+struct AVLNode* insert(struct AVLNode* node, char* key) {
+    // realiza a inserção padrão de uma árvore binária de busca
+    if (node == NULL) {
+        return newNode(key);
+    }
+
+    if (strcmp(key, node->key) < 0) {
+        node->left = insert(node->left, key);
+    } else if (strcmp(key, node->key) > 0) {
+        node->right = insert(node->right, key);
+    } else {  // a chave já existe na árvore
+        return node;
+    }
+
+    // atualiza a altura do nó pai
+    node->height = 1 + fmax(getHeight(node->left), getHeight(node->right));
+
+    // obtem o fator de balanceamento do nó pai
+    int balance = getBalanceFactor(node);
+
